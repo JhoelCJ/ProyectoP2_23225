@@ -3,6 +3,8 @@
 
 #include "BinaryTree.h"
 #include <string>
+#include <sstream>
+#include <SFML/Graphics.hpp>
 
 struct NodeQueueBal {
     Node* steps[100];
@@ -32,9 +34,8 @@ struct NodeQueueBal {
 
 class Balancer {
 public:
-    static char rotacionesRealizadas[10][50];
-    static int rotacionIndex;
     static std::string mensajes[10];
+    static int rotacionIndex;
     static NodeQueueBal animationQueue;
 
     static Node* rotateRight(Node* y) {
@@ -63,19 +64,19 @@ public:
 
         if (balanceFactor > 1) {
             if (getHeight(node->left->left) >= getHeight(node->left->right)) {
-                record("Rotación Derecha (LL)", node);
+                record("II", node);
                 return rotateRight(node);
             } else {
-                record("Doble Rotación Izquierda-Derecha (LR)", node);
+                record("ID", node);
                 node->left = rotateLeft(node->left);
                 return rotateRight(node);
             }
         } else if (balanceFactor < -1) {
             if (getHeight(node->right->right) >= getHeight(node->right->left)) {
-                record("Rotación Izquierda (RR)", node);
+                record("DD", node);
                 return rotateLeft(node);
             } else {
-                record("Doble Rotación Derecha-Izquierda (RL)", node);
+                record("DI", node);
                 node->right = rotateRight(node->right);
                 return rotateLeft(node);
             }
@@ -84,20 +85,6 @@ public:
         return node;
     }
 
-    /*static void drawResult(sf::RenderWindow& window, sf::Font& font) {
-        if (rotacionIndex == 0) return;
-
-        sf::Text result("AVL: ", font, 20);
-        std::string msg;
-        for (int i = 0; i < rotacionIndex; ++i) {
-            msg += rotacionesRealizadas[i];
-            msg += ". ";
-        }
-        result.setString(msg);
-        result.setFillColor(sf::Color::Green);
-        result.setPosition(50, 560);
-        window.draw(result);
-    }*/
     static std::string wrapText(const std::string& texto, int anchoLinea) {
         std::string result;
         int contador = 0;
@@ -116,9 +103,10 @@ public:
         if (rotacionIndex == 0) return;
 
         std::ostringstream mensaje;
-        mensaje << "Rotaciones AVL: ";
+        mensaje << "Rotaciones: ";
         for (int i = 0; i < rotacionIndex; ++i) {
-            mensaje << mensajes[i] << " ";
+            mensaje << mensajes[i];
+            if (i < rotacionIndex - 1) mensaje << ", ";
         }
 
         std::string wrapped = wrapText(mensaje.str(), 60);
@@ -126,24 +114,18 @@ public:
         resultText.setFillColor(sf::Color::Green);
         resultText.setPosition(20, 500);
 
-        if (resultText.getLocalBounds().width > 700) {
-            float scale = 700.f / resultText.getLocalBounds().width;
-            resultText.setScale(scale, scale);
-        }
-
         window.draw(resultText);
     }
 
-private:
+    static void clear() {
+        rotacionIndex = 0;
+        animationQueue.clear();
+    }
 
+private:
     static void record(const char* msg, Node* n) {
         if (rotacionIndex < 10) {
-            int i = 0;
-            while (msg[i] && i < 49) {
-                rotacionesRealizadas[rotacionIndex][i] = msg[i];
-                ++i;
-            }
-            rotacionesRealizadas[rotacionIndex][i] = '\0';
+            mensajes[rotacionIndex] = msg;
             ++rotacionIndex;
             if (n) animationQueue.enqueue(n);
         }
@@ -155,23 +137,10 @@ private:
         int rh = getHeight(node->right);
         return 1 + (lh > rh ? lh : rh);
     }
-
-    static void record(const char* msg) {
-        if (rotacionIndex < 10) {
-            int i = 0;
-            while (msg[i] && i < 49) {
-                rotacionesRealizadas[rotacionIndex][i] = msg[i];
-                ++i;
-            }
-            rotacionesRealizadas[rotacionIndex][i] = '\0';
-            ++rotacionIndex;
-        }
-    }
 };
 
-inline char Balancer::rotacionesRealizadas[10][50];
+inline std::string Balancer::mensajes[10];
 inline int Balancer::rotacionIndex = 0;
 inline NodeQueueBal Balancer::animationQueue;
-inline std::string Balancer::mensajes[10];
 
 #endif // BALANCEO_H_INCLUDED

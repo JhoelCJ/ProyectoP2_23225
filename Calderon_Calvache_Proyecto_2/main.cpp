@@ -11,12 +11,11 @@
 enum class Pantalla { PRINCIPAL, RECORRIDO, BUSQUEDA, ELIMINAR, BALANCEO };
 
 int main() {
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, " ");
 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Árbol Binario Visual con TGUI");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Arbol Binario Visual con TGUI");
     tgui::Gui gui(window);
 
-    // Cargar fuente personalizada
     sf::Font font;
     if (!font.loadFromFile("fuente/MinecraftTen.ttf")) {
         std::cerr << "No se pudo cargar la fuente MinecraftTen.ttf" << std::endl;
@@ -26,11 +25,12 @@ int main() {
     BinaryTree tree;
     Pantalla pantallaActual = Pantalla::PRINCIPAL;
 
-    // Crear elementos reutilizables
+    bool textoVisible = false;
+
     auto input = tgui::EditBox::create();
     input->setPosition(20, 20);
     input->setSize(100, 30);
-    input->setDefaultText("Numero [0]");
+    input->setDefaultText("Numero ejm: 0");
     gui.add(input);
 
     auto statusLabel = tgui::Label::create();
@@ -40,61 +40,114 @@ int main() {
     statusLabel->getRenderer()->setTextColor(tgui::Color::Black);
     gui.add(statusLabel);
 
-    // Botón Insertar
+    sf::Clock statusClock;
+    bool statusVisible = false;
+
     auto insertarBtn = tgui::Button::create("Insertar");
     insertarBtn->setPosition(130, 20);
     insertarBtn->setSize(80, 30);
+
+    insertarBtn->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
+    insertarBtn->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+
     gui.add(insertarBtn);
     insertarBtn->onPress([&]() {
         std::string texto = input->getText().toStdString();
         if (!texto.empty()) {
             try {
                 int valor = std::stoi(texto);
-                tree.insert(valor);
-                tree.updatePositions();
-                Traversal::animationQueue.clear();
-                Search::animationQueue.clear();
-                Traversal::currentResult.clear();
-                Search::currentResult.clear();
-                input->setText("");
+                bool inserted = tree.insert(valor);
+                if (inserted) {
+                    tree.updatePositions();
+                    Traversal::animationQueue.clear();
+                    Search::animationQueue.clear();
+                    Traversal::currentResult.clear();
+                    Search::currentResult.clear();
+                    input->setText("");
+                    statusLabel->setText("Numero insertado exitosamente");
+                } else {
+                    statusLabel->setText("Número repetido, intente nuevamente");
+                }
+                statusClock.restart();
+                statusVisible = true;
             } catch (...) {
-                statusLabel->setText("Entrada inválida para insertar.");
+                statusLabel->setText("Entrada invalida para insertar.");
+                statusClock.restart();
+                statusVisible = true;
             }
         }
     });
 
-    // Botones de navegación
     auto btnRecorrido = tgui::Button::create("Recorridos");
     btnRecorrido->setPosition(230, 20);
     btnRecorrido->setSize(100, 30);
+
+    btnRecorrido->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
+    btnRecorrido->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+
     gui.add(btnRecorrido);
-    btnRecorrido->onPress([&]() { pantallaActual = Pantalla::RECORRIDO; });
+    btnRecorrido->onPress([&]() {
+        pantallaActual = Pantalla::RECORRIDO;
+        Traversal::currentResult.clear();
+        Search::currentResult.clear();
+        textoVisible = false;
+    });
 
     auto btnBusqueda = tgui::Button::create("Busqueda");
     btnBusqueda->setPosition(340, 20);
     btnBusqueda->setSize(100, 30);
+
+    btnBusqueda->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
+    btnBusqueda->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+
     gui.add(btnBusqueda);
-    btnBusqueda->onPress([&]() { pantallaActual = Pantalla::BUSQUEDA; });
+    btnBusqueda->onPress([&]() {
+        pantallaActual = Pantalla::BUSQUEDA;
+        Traversal::currentResult.clear();
+        Search::currentResult.clear();
+    });
 
     auto btnEliminar = tgui::Button::create("Eliminar");
     btnEliminar->setPosition(450, 20);
     btnEliminar->setSize(100, 30);
+
+    btnEliminar->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
+    btnEliminar->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+
     gui.add(btnEliminar);
     btnEliminar->onPress([&]() { pantallaActual = Pantalla::ELIMINAR; });
 
     auto btnBalancear = tgui::Button::create("Balancear");
     btnBalancear->setPosition(560, 20);
     btnBalancear->setSize(100, 30);
+
+    btnBalancear->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
+    btnBalancear->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+
     gui.add(btnBalancear);
-    btnBalancear->onPress([&]() { pantallaActual = Pantalla::BALANCEO; });
+    btnBalancear->onPress([&]() {
+        pantallaActual = Pantalla::BALANCEO;
+        Traversal::animationQueue.clear();
+        Search::animationQueue.clear();
+        Balancer::animationQueue.clear();
+
+        Traversal::currentResult.clear();
+        Search::currentResult.clear();
+        Balancer::clear();
+
+        textoVisible = false;
+    });
 
     auto btnVolver = tgui::Button::create("Volver");
     btnVolver->setPosition(680, 20);
     btnVolver->setSize(100, 30);
+
+    btnVolver->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
+    btnVolver->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+
     gui.add(btnVolver);
     btnVolver->onPress([&]() { pantallaActual = Pantalla::PRINCIPAL; });
 
-    // ComboBox para Recorridos
     auto recorridoBox = tgui::ComboBox::create();
     recorridoBox->setPosition(20, 60);
     recorridoBox->setSize(200, 30);
@@ -116,9 +169,10 @@ int main() {
             Traversal::preorder(tree.getRoot(), tree.getRoot(), window, font);
         else if (selected == "Postorden")
             Traversal::postorder(tree.getRoot(), tree.getRoot(), window, font);
+
+        textoVisible = true;//
     });
 
-    // ComboBox + botón para Búsqueda
     auto searchTypeBox = tgui::ComboBox::create();
     searchTypeBox->setPosition(20, 60);
     searchTypeBox->setSize(200, 30);
@@ -147,16 +201,17 @@ int main() {
                 Search::breadthFirstSearch(tree.getRoot(), valor, window, font);
             input->setText("");
         } catch (...) {
-            statusLabel->setText("Entrada inválida para búsqueda.");
+            statusLabel->setText("Entrada invalida para busqueda.");
+            statusClock.restart();
+            statusVisible = true;
         }
     });
 
-    // ComboBox para método de eliminación
     auto metodoBox = tgui::ComboBox::create();
     metodoBox->setPosition(20, 60);
     metodoBox->setSize(300, 30);
-    metodoBox->addItem("Reemplazar por el mayor del subárbol izquierdo");
-    metodoBox->addItem("Reemplazar por el menor del subárbol derecho");
+    metodoBox->addItem("Reemplazar por el mayor del subarbol izquierdo");
+    metodoBox->addItem("Reemplazar por el menor del subarbol derecho");
     metodoBox->setSelectedItemByIndex(0);
     gui.add(metodoBox);
 
@@ -181,8 +236,12 @@ int main() {
                 Traversal::currentResult.clear();
                 Search::currentResult.clear();
                 input->setText("");
+                statusClock.restart();
+                statusVisible = true;
             } catch (...) {
                 statusLabel->setText("Error al eliminar nodo.");
+                statusClock.restart();
+                statusVisible = true;
             }
         }
     });
@@ -193,6 +252,7 @@ int main() {
     gui.add(avlBtn);
     avlBtn->onPress([&]() {
         Balancer::animationQueue.clear();
+        Balancer::rotacionIndex = 0;
         tree.setRoot(Balancer::balance(tree.getRoot()));
         tree.updatePositions();
         Traversal::animationQueue.clear();
@@ -200,9 +260,11 @@ int main() {
         Traversal::currentResult.clear();
         Search::currentResult.clear();
         statusLabel->setText("AVL aplicado.");
+        statusClock.restart();
+        statusVisible = true;
+        textoVisible = true;
     });
 
-    // Mostrar u ocultar widgets según la pantalla actual
     auto setVisibilidad = [&](Pantalla pantalla) {
         recorridoBox->setVisible(pantalla == Pantalla::RECORRIDO);
         searchTypeBox->setVisible(pantalla == Pantalla::BUSQUEDA);
@@ -260,13 +322,25 @@ int main() {
                 }
             }
             Balancer::drawResult(window, font);
+
         } else if (animacionTerminada) {
-            if (finalDelayClock.getElapsedTime().asMilliseconds() > 2000) {
+            if (finalDelayClock.getElapsedTime().asMilliseconds() > 3000) {
                 currentHighlight = nullptr;
                 animacionTerminada = false;
             }
         } else {
             currentHighlight = nullptr;
+        }
+
+        if (textoVisible) {
+            Traversal::drawResult(window, font);
+            Search::drawResult(window, font);
+            Balancer::drawResult(window, font);
+        }
+
+        if (statusVisible && statusClock.getElapsedTime().asSeconds() > 2.f) {
+            statusLabel->setText("");
+            statusVisible = false;
         }
 
         if (currentHighlight) {

@@ -6,7 +6,7 @@
 #include <sstream>
 #include <queue>
 
-struct NodeQueuee {  // Nombre cambiado para evitar choque
+struct NodeQueuee {
     Node* steps[100];
     int front = 0;
     int rear = 0;
@@ -35,26 +35,24 @@ struct NodeQueuee {  // Nombre cambiado para evitar choque
 class Search {
 public:
     static std::string currentResult;
-    static NodeQueuee animationQueue;  // <- Cambiado a NodeQueuee
+    static NodeQueuee animationQueue;
 
-    // Búsqueda por profundidad (DFS preorden)
     static void depthFirstSearch(Node* node, int target, sf::RenderWindow& window, sf::Font& font) {
         std::ostringstream result;
         animationQueue.clear();
         bool found = dfsRecursive(node, target, result);
         if (found) {
-            currentResult = "Búsqueda en Profundidad: Encontrado " + std::to_string(target) + " | Camino: " + result.str();
+            currentResult = "Busqueda en Profundidad: Encontrado " + std::to_string(target) + " -> Camino: " + result.str();
         } else {
-            currentResult = "Búsqueda en Profundidad: No se encontró " + std::to_string(target) + " | Camino: " + result.str();
+            currentResult = "Busqueda en Profundidad: No se encontró " + std::to_string(target) + " -> Camino: " + result.str();
         }
     }
 
-    // Búsqueda por anchura (BFS)
     static void breadthFirstSearch(Node* root, int target, sf::RenderWindow& window, sf::Font& font) {
         std::ostringstream result;
         animationQueue.clear();
         if (!root) {
-            currentResult = "Árbol vacío";
+            currentResult = "Arbol vacio";
             return;
         }
 
@@ -79,20 +77,12 @@ public:
         }
 
         if (found) {
-            currentResult = "Búsqueda en Anchura: Encontrado " + std::to_string(target) + " | Camino: " + result.str();
+            currentResult = "Busqueda en Anchura: Encontrado " + std::to_string(target) + " -> Camino: " + result.str();
         } else {
-            currentResult = "Búsqueda en Anchura: No se encontró " + std::to_string(target) + " | Camino: " + result.str();
+            currentResult = "Busqueda en Anchura: No se encontro " + std::to_string(target) + " -> Camino: " + result.str();
         }
     }
 
-    /*static void drawResult(sf::RenderWindow& window, sf::Font& font) {
-        if (currentResult.empty()) return;
-
-        sf::Text resultText(currentResult, font, 20);
-        resultText.setFillColor(sf::Color::Blue);
-        resultText.setPosition(50, 540);
-        window.draw(resultText);
-    }*/
     static std::string wrapText(const std::string& texto, int anchoLinea) {
         std::string result;
         int contador = 0;
@@ -123,7 +113,6 @@ public:
         window.draw(resultText);
     }
 
-
 private:
     static bool dfsRecursive(Node* node, int target, std::ostringstream& result) {
         if (!node) return false;
@@ -140,8 +129,8 @@ private:
     }
 };
 
-// Definición de variables estáticas
+
 std::string Search::currentResult = "";
-NodeQueuee Search::animationQueue;  // <- Cambiado a NodeQueuee
+NodeQueuee Search::animationQueue;
 
 #endif // BUSQUEDA_H_INCLUDED

@@ -33,12 +33,12 @@ public:
                 Node* maxLeft = findMax(root->left);
                 root->value = maxLeft->value;
                 root->left = remove(root->left, maxLeft->value, usarMayor);
-                mensajes[mensajeCount++] = "Reemplazado por mayor del subárbol izquierdo.";
+                mensajes[mensajeCount++] = "Reemplazado por mayor del subarbol izquierdo.";
             } else {
                 Node* minRight = findMin(root->right);
                 root->value = minRight->value;
                 root->right = remove(root->right, minRight->value, usarMayor);
-                mensajes[mensajeCount++] = "Reemplazado por menor del subárbol derecho.";
+                mensajes[mensajeCount++] = "Reemplazado por menor del subarbol derecho.";
             }
         }
         return root;
@@ -61,7 +61,6 @@ private:
     }
 };
 
-// ✅ DEFINICIÓN REAL FUERA DE LA CLASE
 inline std::string Deleter::mensajes[10];
 inline int Deleter::mensajeCount = 0;
 

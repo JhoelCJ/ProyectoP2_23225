@@ -57,15 +57,6 @@ public:
         currentResult = "Postorden: " + result.str();
     }
 
-    /*static void drawResult(sf::RenderWindow& window, sf::Font& font) {
-        if (currentResult.empty()) return;
-
-        sf::Text resultText(currentResult, font, 20);
-        resultText.setFillColor(sf::Color::Red);
-        resultText.setPosition(50, 550);
-        window.draw(resultText);
-    }*/
-
     static std::string wrapText(const std::string& texto, int anchoLinea) {
         std::string result;
         int contador = 0;
@@ -81,12 +72,13 @@ public:
     }
 
     static void drawResult(sf::RenderWindow& window, sf::Font& font) {
-        if (currentResult.empty()) return;
+        if (currentResult.empty())
+            return;
 
-        std::string wrapped = wrapText(currentResult, 60);
+        std::string wrapped = wrapText(currentResult, 80);
         sf::Text resultText(wrapped, font, 18);
         resultText.setFillColor(sf::Color::Red);
-        resultText.setPosition(20, 540);
+        resultText.setPosition(20, 550);
 
         if (resultText.getLocalBounds().width > 1000) {
             float scale = 700.f / resultText.getLocalBounds().width;

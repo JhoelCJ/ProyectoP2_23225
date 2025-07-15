@@ -2,7 +2,7 @@
 #define BINARYTREE_H
 
 #include <SFML/Graphics.hpp>
-#include <cmath> // Para sqrt
+#include <cmath>
 
 struct Node {
     int value;
@@ -27,8 +27,10 @@ public:
 
     void setRoot(Node* newRoot) { root = newRoot; }
 
-    void insert(int value) {
-        root = insertRecursive(root, value, 400, 125, 200);
+    bool insert(int value) {
+        bool inserted = false;
+        root = insertRecursive(root, value, 400, 125, 200, inserted);
+        return inserted;
     }
 
     void draw(sf::RenderWindow& window, sf::Font& font) {
@@ -40,17 +42,21 @@ public:
     }
 
 private:
-    Node* insertRecursive(Node* node, int value, float x, float y, float offset) {
+    Node* insertRecursive(Node* node, int value, float x, float y, float offset, bool& inserted) {
         if (!node) {
             Node* newNode = new Node(value);
             newNode->x = x;
             newNode->y = y;
+            inserted = true;
             return newNode;
         }
-        if (value < node->value)
-            node->left = insertRecursive(node->left, value, x - offset, y + verticalSpacing, offset / 2);
-        else
-            node->right = insertRecursive(node->right, value, x + offset, y + verticalSpacing, offset / 2);
+        if (value < node->value){
+            node->left = insertRecursive(node->left, value, x - offset, y + verticalSpacing, offset / 2, inserted);
+        }else if (value > node->value){
+            node->right = insertRecursive(node->right, value, x + offset, y + verticalSpacing, offset / 2, inserted);
+        }else{
+            inserted = false;
+        }
         return node;
     }
 
