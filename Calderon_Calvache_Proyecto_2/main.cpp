@@ -2,12 +2,13 @@
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
-
 #include "BinaryTree.h"
 #include "Balanceo.h"
 #include "RecorridoIN.h"
 #include "Eliminar.h"
 #include "Busqueda.h"
+
+enum class Pantalla { PRINCIPAL, RECORRIDO, BUSQUEDA, ELIMINAR, BALANCEO };
 
 int main() {
     setlocale(LC_ALL, "");
@@ -15,194 +16,206 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Árbol Binario Visual con TGUI");
     tgui::Gui gui(window);
 
-    // Fuente para nodos
+    // Cargar fuente personalizada
     sf::Font font;
-    if (!font.loadFromFile("fuente/MinecraftTen.ttf")) return -1;
+    if (!font.loadFromFile("fuente/MinecraftTen.ttf")) {
+        std::cerr << "No se pudo cargar la fuente MinecraftTen.ttf" << std::endl;
+        return -1;
+    }
 
-    // Árbol binario
     BinaryTree tree;
+    Pantalla pantallaActual = Pantalla::PRINCIPAL;
 
-    // Entrada de número
+    // Crear elementos reutilizables
     auto input = tgui::EditBox::create();
     input->setPosition(20, 20);
     input->setSize(100, 30);
     input->setDefaultText("Numero [0]");
     gui.add(input);
 
-    // Botón de insertar
-    auto button = tgui::Button::create("Insertar");
-    button->setPosition(130, 20);
-    button->setSize(80, 30);
-    gui.add(button);
+    auto statusLabel = tgui::Label::create();
+    statusLabel->setPosition(20, 560);
+    statusLabel->setTextSize(18);
+    statusLabel->setSize(760, 30);
+    statusLabel->getRenderer()->setTextColor(tgui::Color::Black);
+    gui.add(statusLabel);
 
-    button->onPress([&]() {
+    // Botón Insertar
+    auto insertarBtn = tgui::Button::create("Insertar");
+    insertarBtn->setPosition(130, 20);
+    insertarBtn->setSize(80, 30);
+    gui.add(insertarBtn);
+    insertarBtn->onPress([&]() {
         std::string texto = input->getText().toStdString();
         if (!texto.empty()) {
             try {
                 int valor = std::stoi(texto);
                 tree.insert(valor);
                 tree.updatePositions();
-
-                // Limpiar animaciones y textos previos
                 Traversal::animationQueue.clear();
                 Search::animationQueue.clear();
                 Traversal::currentResult.clear();
                 Search::currentResult.clear();
-
-                input->setText("");
-            } catch (...) {}
-        }
-    });
-
-    // Botón para eliminar nodo
-    auto eliminarBtn = tgui::Button::create("Eliminar");
-    eliminarBtn->setPosition(220, 20);
-    eliminarBtn->setSize(80, 30);
-    gui.add(eliminarBtn);
-
-    auto metodoBox = tgui::ComboBox::create();
-    metodoBox->setPosition(510, 20);
-    metodoBox->setSize(250, 30);
-    metodoBox->addItem("Reemplazar por el mayor del subárbol izquierdo");
-    metodoBox->addItem("Reemplazar por el menor del subárbol derecho");
-    metodoBox->setSelectedItemByIndex(0);
-    metodoBox->setTextSize(10);
-    gui.add(metodoBox);
-
-    // Etiqueta para mostrar mensajes
-    auto statusLabel = tgui::Label::create();
-    statusLabel->setPosition(20, 570);
-    statusLabel->setTextSize(18);
-    statusLabel->setSize(700, 30);
-    statusLabel->getRenderer()->setTextColor(tgui::Color::Black);
-    gui.add(statusLabel);
-
-    // Botón de eliminar con uso correcto de Deleter y verificacion de index:
-    eliminarBtn->onPress([&]() {
-        std::string texto = input->getText().toStdString();
-        if (!texto.empty()) {
-            try {
-                int valor = std::stoi(texto);
-                bool usarMayor = metodoBox->getSelectedItemIndex() == 0;
-                Deleter::remove(tree, valor, usarMayor);
-
-                std::string mensaje;
-                for (int i = 0; i < Deleter::mensajeCount; ++i) {
-                    mensaje += Deleter::mensajes[i] + " ";
-                }
-                statusLabel->setText(mensaje);
-
-                Traversal::animationQueue.clear();
-                Search::animationQueue.clear();
-                Traversal::currentResult.clear();
-                Search::currentResult.clear();
-
                 input->setText("");
             } catch (...) {
-                statusLabel->setText("Error al convertir el valor ingresado para eliminar.");
+                statusLabel->setText("Entrada inválida para insertar.");
             }
         }
     });
 
-    // Botón para balancear AVL
-    auto avlBtn = tgui::Button::create("Balancear AVL");
-    avlBtn->setPosition(600, 60);
-    avlBtn->setSize(130, 30);
-    gui.add(avlBtn);
+    // Botones de navegación
+    auto btnRecorrido = tgui::Button::create("Recorridos");
+    btnRecorrido->setPosition(230, 20);
+    btnRecorrido->setSize(100, 30);
+    gui.add(btnRecorrido);
+    btnRecorrido->onPress([&]() { pantallaActual = Pantalla::RECORRIDO; });
 
-    avlBtn->onPress([&]() {
-        Balancer::rotacionIndex = 0;
-        Balancer::animationQueue.clear();
+    auto btnBusqueda = tgui::Button::create("Busqueda");
+    btnBusqueda->setPosition(340, 20);
+    btnBusqueda->setSize(100, 30);
+    gui.add(btnBusqueda);
+    btnBusqueda->onPress([&]() { pantallaActual = Pantalla::BUSQUEDA; });
 
-        tree.setRoot(Balancer::balance(tree.getRoot()));
-        tree.updatePositions();
+    auto btnEliminar = tgui::Button::create("Eliminar");
+    btnEliminar->setPosition(450, 20);
+    btnEliminar->setSize(100, 30);
+    gui.add(btnEliminar);
+    btnEliminar->onPress([&]() { pantallaActual = Pantalla::ELIMINAR; });
 
-        if (Balancer::rotacionIndex == 0) {
-            statusLabel->setText("AVL: No se realizaron rotaciones.");
-        }
+    auto btnBalancear = tgui::Button::create("Balancear");
+    btnBalancear->setPosition(560, 20);
+    btnBalancear->setSize(100, 30);
+    gui.add(btnBalancear);
+    btnBalancear->onPress([&]() { pantallaActual = Pantalla::BALANCEO; });
 
-        Traversal::animationQueue.clear();
-        Search::animationQueue.clear();
-        Traversal::currentResult.clear();
-        Search::currentResult.clear();
-    });
+    auto btnVolver = tgui::Button::create("Volver");
+    btnVolver->setPosition(680, 20);
+    btnVolver->setSize(100, 30);
+    gui.add(btnVolver);
+    btnVolver->onPress([&]() { pantallaActual = Pantalla::PRINCIPAL; });
 
-    // ComboBox para tipo de recorrido
+    // ComboBox para Recorridos
     auto recorridoBox = tgui::ComboBox::create();
-    recorridoBox->setPosition(400, 20);
-    recorridoBox->setSize(100, 30);
+    recorridoBox->setPosition(20, 60);
+    recorridoBox->setSize(200, 30);
     recorridoBox->addItem("Inorden");
     recorridoBox->addItem("Preorden");
     recorridoBox->addItem("Postorden");
     recorridoBox->setDefaultText("Recorrido");
-    recorridoBox->setTextSize(10);
     gui.add(recorridoBox);
-
     recorridoBox->onItemSelect([&]() {
         std::string selected = recorridoBox->getSelectedItem().toStdString();
-        // Limpiar animaciones y textos previos
         Traversal::animationQueue.clear();
+        Traversal::currentResult.clear();
         Search::animationQueue.clear();
         Search::currentResult.clear();
 
-        if (selected == "Inorden") {
+        if (selected == "Inorden")
             Traversal::inorder(tree.getRoot(), tree.getRoot(), window, font);
-        } else if (selected == "Preorden") {
+        else if (selected == "Preorden")
             Traversal::preorder(tree.getRoot(), tree.getRoot(), window, font);
-        } else if (selected == "Postorden") {
+        else if (selected == "Postorden")
             Traversal::postorder(tree.getRoot(), tree.getRoot(), window, font);
-        }
     });
 
-    // ComboBox para tipo de búsqueda
+    // ComboBox + botón para Búsqueda
     auto searchTypeBox = tgui::ComboBox::create();
     searchTypeBox->setPosition(20, 60);
     searchTypeBox->setSize(200, 30);
     searchTypeBox->addItem("Busqueda en Profundidad");
     searchTypeBox->addItem("Busqueda en Anchura");
     searchTypeBox->setDefaultText("Tipo de Busqueda");
-    searchTypeBox->setTextSize(12);
     gui.add(searchTypeBox);
 
-    // Botón para buscar
     auto searchBtn = tgui::Button::create("Buscar");
     searchBtn->setPosition(230, 60);
     searchBtn->setSize(80, 30);
     gui.add(searchBtn);
-
     searchBtn->onPress([&]() {
         std::string texto = input->getText().toStdString();
-        std::string searchType = searchTypeBox->getSelectedItem().toStdString();
-
-        if (texto.empty()) return;
-
-        if (searchType.empty()) {
-            std::cout << "Seleccione un tipo de busqueda." << std::endl;
-            return;
-        }
-
+        std::string tipo = searchTypeBox->getSelectedItem().toStdString();
+        if (texto.empty() || tipo.empty()) return;
         try {
             int valor = std::stoi(texto);
-
-            // Limpiar animaciones y textos previos
             Traversal::animationQueue.clear();
             Search::animationQueue.clear();
             Traversal::currentResult.clear();
-
-            if (searchType == "Busqueda en Profundidad") {
+            Search::currentResult.clear();
+            if (tipo == "Busqueda en Profundidad")
                 Search::depthFirstSearch(tree.getRoot(), valor, window, font);
-            } else if (searchType == "Busqueda en Anchura") {
+            else
                 Search::breadthFirstSearch(tree.getRoot(), valor, window, font);
-            }
             input->setText("");
         } catch (...) {
-            std::cout << "Entrada inválida para búsqueda." << std::endl;
+            statusLabel->setText("Entrada inválida para búsqueda.");
         }
     });
 
-    // Bucle principal
+    // ComboBox para método de eliminación
+    auto metodoBox = tgui::ComboBox::create();
+    metodoBox->setPosition(20, 60);
+    metodoBox->setSize(300, 30);
+    metodoBox->addItem("Reemplazar por el mayor del subárbol izquierdo");
+    metodoBox->addItem("Reemplazar por el menor del subárbol derecho");
+    metodoBox->setSelectedItemByIndex(0);
+    gui.add(metodoBox);
+
+    auto eliminarRealBtn = tgui::Button::create("Eliminar Nodo");
+    eliminarRealBtn->setPosition(340, 60);
+    eliminarRealBtn->setSize(100, 30);
+    gui.add(eliminarRealBtn);
+    eliminarRealBtn->onPress([&]() {
+        std::string texto = input->getText().toStdString();
+        if (!texto.empty()) {
+            try {
+                int valor = std::stoi(texto);
+                bool usarMayor = metodoBox->getSelectedItemIndex() == 0;
+                Deleter::remove(tree, valor, usarMayor);
+                tree.updatePositions();
+                std::string mensaje;
+                for (int i = 0; i < Deleter::mensajeCount; ++i)
+                    mensaje += Deleter::mensajes[i] + " ";
+                statusLabel->setText(mensaje);
+                Traversal::animationQueue.clear();
+                Search::animationQueue.clear();
+                Traversal::currentResult.clear();
+                Search::currentResult.clear();
+                input->setText("");
+            } catch (...) {
+                statusLabel->setText("Error al eliminar nodo.");
+            }
+        }
+    });
+
+    auto avlBtn = tgui::Button::create("Aplicar AVL");
+    avlBtn->setPosition(20, 60);
+    avlBtn->setSize(120, 30);
+    gui.add(avlBtn);
+    avlBtn->onPress([&]() {
+        Balancer::animationQueue.clear();
+        tree.setRoot(Balancer::balance(tree.getRoot()));
+        tree.updatePositions();
+        Traversal::animationQueue.clear();
+        Search::animationQueue.clear();
+        Traversal::currentResult.clear();
+        Search::currentResult.clear();
+        statusLabel->setText("AVL aplicado.");
+    });
+
+    // Mostrar u ocultar widgets según la pantalla actual
+    auto setVisibilidad = [&](Pantalla pantalla) {
+        recorridoBox->setVisible(pantalla == Pantalla::RECORRIDO);
+        searchTypeBox->setVisible(pantalla == Pantalla::BUSQUEDA);
+        searchBtn->setVisible(pantalla == Pantalla::BUSQUEDA);
+        metodoBox->setVisible(pantalla == Pantalla::ELIMINAR);
+        eliminarRealBtn->setVisible(pantalla == Pantalla::ELIMINAR);
+        avlBtn->setVisible(pantalla == Pantalla::BALANCEO);
+    };
+
     sf::Clock animationClock;
     Node* currentHighlight = nullptr;
+    bool animacionTerminada = false;
+    sf::Clock finalDelayClock;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -212,15 +225,13 @@ int main() {
                 window.close();
         }
 
+        setVisibilidad(pantallaActual);
+
         window.clear(sf::Color::White);
         tree.draw(window, font);
 
-        // Mostrar animación y texto
-        static bool animacionTerminada = false;
-        static sf::Clock finalDelayClock;
-
         if (!Search::animationQueue.isEmpty()) {
-            if (animationClock.getElapsedTime().asMilliseconds() >= 700) {
+            if (animationClock.getElapsedTime().asMilliseconds() >= 500) {
                 currentHighlight = Search::animationQueue.dequeue();
                 animationClock.restart();
                 if (Search::animationQueue.isEmpty()) {
@@ -230,7 +241,7 @@ int main() {
             }
             Search::drawResult(window, font);
         } else if (!Traversal::animationQueue.isEmpty()) {
-            if (animationClock.getElapsedTime().asMilliseconds() >= 700) {
+            if (animationClock.getElapsedTime().asMilliseconds() >= 500) {
                 currentHighlight = Traversal::animationQueue.dequeue();
                 animationClock.restart();
                 if (Traversal::animationQueue.isEmpty()) {
@@ -239,13 +250,8 @@ int main() {
                 }
             }
             Traversal::drawResult(window, font);
-        } else if (animacionTerminada) {
-            if (finalDelayClock.getElapsedTime().asMilliseconds() > 2000) {
-                currentHighlight = nullptr;
-                animacionTerminada = false;
-            }
         } else if (!Balancer::animationQueue.isEmpty()) {
-            if (animationClock.getElapsedTime().asMilliseconds() >= 1000) {
+            if (animationClock.getElapsedTime().asMilliseconds() >= 500) {
                 currentHighlight = Balancer::animationQueue.dequeue();
                 animationClock.restart();
                 if (Balancer::animationQueue.isEmpty()) {
@@ -254,12 +260,14 @@ int main() {
                 }
             }
             Balancer::drawResult(window, font);
-        }
-        else {
+        } else if (animacionTerminada) {
+            if (finalDelayClock.getElapsedTime().asMilliseconds() > 2000) {
+                currentHighlight = nullptr;
+                animacionTerminada = false;
+            }
+        } else {
             currentHighlight = nullptr;
         }
-
-        gui.draw();
 
         if (currentHighlight) {
             sf::CircleShape highlight(20.f);
@@ -268,6 +276,7 @@ int main() {
             window.draw(highlight);
         }
 
+        gui.draw();
         window.display();
     }
 
