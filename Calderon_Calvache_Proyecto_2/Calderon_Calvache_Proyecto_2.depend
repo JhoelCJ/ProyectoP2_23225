@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1752628528 source:d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\main.cpp
+1752632535 source:d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\main.cpp
 	<TGUI/TGUI.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -418,7 +418,7 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1752628662 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\binarytree.h
+1752629625 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\binarytree.h
 	<SFML/Graphics.hpp>
 	<cmath>
 
@@ -1971,13 +1971,12 @@
 	<SFML/Graphics.hpp>
 	<sstream>
 
-1752625417 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\eliminar.h
+1752633484 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\eliminar.h
 	"BinaryTree.h"
 	<string>
 
-1752622910 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\busqueda.h
+1752630660 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\busqueda.h
 	"BinaryTree.h"
 	<SFML/Graphics.hpp>
 	<sstream>
-	<queue>
 

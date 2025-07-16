@@ -88,7 +88,6 @@ public:
         window.draw(resultText);
     }
 
-
 private:
     static void inorderRecursive(Node* node, std::ostringstream& result) {
         if (!node) return;

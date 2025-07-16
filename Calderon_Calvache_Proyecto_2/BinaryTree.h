@@ -72,7 +72,6 @@ public:
         updatePositionsRecursive(node->right, depth + 1, tracker);
     }
 
-
 private:
     Node* insertRecursive(Node* node, int value, float x, float y, float offset, bool& inserted) {
         if (!node) {

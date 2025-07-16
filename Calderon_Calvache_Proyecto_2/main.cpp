@@ -49,10 +49,8 @@ int main() {
     auto insertarBtn = tgui::Button::create("Insertar");
     insertarBtn->setPosition(130, 20);
     insertarBtn->setSize(80, 30);
-
     insertarBtn->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
     insertarBtn->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
-
     gui.add(insertarBtn);
     insertarBtn->onPress([&]() {
         std::string texto = input->getText().toStdString();
@@ -84,10 +82,8 @@ int main() {
     auto btnRecorrido = tgui::Button::create("Recorridos");
     btnRecorrido->setPosition(230, 20);
     btnRecorrido->setSize(100, 30);
-
     btnRecorrido->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
     btnRecorrido->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
-
     gui.add(btnRecorrido);
     btnRecorrido->onPress([&]() {
         pantallaActual = Pantalla::RECORRIDO;
@@ -100,10 +96,8 @@ int main() {
     auto btnBusqueda = tgui::Button::create("Busqueda");
     btnBusqueda->setPosition(340, 20);
     btnBusqueda->setSize(100, 30);
-
     btnBusqueda->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
     btnBusqueda->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
-
     gui.add(btnBusqueda);
     btnBusqueda->onPress([&]() {
         pantallaActual = Pantalla::BUSQUEDA;
@@ -116,10 +110,8 @@ int main() {
     auto btnEliminar = tgui::Button::create("Eliminar");
     btnEliminar->setPosition(450, 20);
     btnEliminar->setSize(100, 30);
-
     btnEliminar->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
     btnEliminar->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
-
     gui.add(btnEliminar);
     btnEliminar->onPress([&]() {
         pantallaActual = Pantalla::ELIMINAR;
@@ -130,17 +122,14 @@ int main() {
     auto btnBalancear = tgui::Button::create("Balancear");
     btnBalancear->setPosition(560, 20);
     btnBalancear->setSize(100, 30);
-
     btnBalancear->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
     btnBalancear->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
-
     gui.add(btnBalancear);
     btnBalancear->onPress([&]() {
         pantallaActual = Pantalla::BALANCEO;
         Traversal::animationQueue.clear();
         Search::animationQueue.clear();
         Balancer::animationQueue.clear();
-
         Traversal::currentResult.clear();
         Search::currentResult.clear();
         Balancer::clear();
@@ -151,10 +140,8 @@ int main() {
     auto btnSalir = tgui::Button::create("Salir :(");
     btnSalir->setPosition(680, 20);
     btnSalir->setSize(100, 30);
-
     btnSalir->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
     btnSalir->getRenderer()->setBackgroundColorHover(tgui::Color::Red);
-
     gui.add(btnSalir);
     btnSalir->onPress([&]() { window.close(); });
 
@@ -290,43 +277,39 @@ int main() {
     bool animacionTerminada = false;
     sf::Clock finalDelayClock;
 
-        auto sliderHorizontal = tgui::Slider::create();
-        sliderHorizontal->setMinimum(0);
-        sliderHorizontal->setMaximum(1000);
-        sliderHorizontal->setValue(500);
-        gui.add(sliderHorizontal);
+    auto sliderHorizontal = tgui::Slider::create();
+    sliderHorizontal->setMinimum(0);
+    sliderHorizontal->setMaximum(1000);
+    sliderHorizontal->setValue(500);
+    gui.add(sliderHorizontal);
 
-        auto sliderVertical = tgui::Slider::create();
-        sliderVertical->setVerticalScroll(true);
-        sliderVertical->setMinimum(0);
-        sliderVertical->setMaximum(1000);
-        sliderVertical->setValue(500);
-        gui.add(sliderVertical);
+    auto sliderVertical = tgui::Slider::create();
+    sliderVertical->setVerticalScroll(true);
+    sliderVertical->setMinimum(0);
+    sliderVertical->setMaximum(1000);
+    sliderVertical->setValue(500);
+    gui.add(sliderVertical);
 
-        // Función para actualizar tamaño y posición de sliders
-        auto actualizarSliders = [&](unsigned int width, unsigned int height) {
-        sliderHorizontal->setSize(width - 10, 10); // horizontal delgada
-        sliderHorizontal->setPosition(0, height - 10);
+    auto actualizarSliders = [&](unsigned int width, unsigned int height) {
+    sliderHorizontal->setSize(width - 10, 10);
+    sliderHorizontal->setPosition(0, height - 10);
 
-        sliderVertical->setSize(10, height - 10); // vertical delgada
-        sliderVertical->setPosition(width - 10, 0);
+    sliderVertical->setSize(10, height - 10);
+    sliderVertical->setPosition(width - 10, 0);
 
-        // Opcional: ajustar máximos en base al tamaño del view
-        sliderHorizontal->setMaximum(width * 2);
+    sliderHorizontal->setMaximum(width * 2);
         sliderVertical->setMaximum(height * 2);
-        };
+    };
 
-        // Llamada inicial
-        actualizarSliders(window.getSize().x, window.getSize().y);
+    actualizarSliders(window.getSize().x, window.getSize().y);
 
-        // Reacciones a sliders
-        sliderHorizontal->onValueChange([&](float value){
+    sliderHorizontal->onValueChange([&](float value){
             view.setCenter(value, view.getCenter().y);
-        });
+    });
 
-        sliderVertical->onValueChange([&](float value){
+    sliderVertical->onValueChange([&](float value){
             view.setCenter(view.getCenter().x, value);
-        });
+    });
 
     while (window.isOpen()) {
         sf::Event event;
@@ -334,22 +317,42 @@ int main() {
             gui.handleEvent(event);
             if (event.type == sf::Event::Closed){
                 window.close();
-        }else if (event.type == sf::Event::Resized) {
-    // Ajustar view y sliders cuando la ventana cambia de tamaño
-            view.setSize(event.size.width, event.size.height);
-            view.setCenter(event.size.width / 2.f, event.size.height / 2.f);
-            window.setView(view);
-
-            actualizarSliders(event.size.width, event.size.height);
-        }
+            }else if (event.type == sf::Event::Resized) {
+                view.setSize(event.size.width, event.size.height);
+                view.setCenter(event.size.width / 2.f, event.size.height / 2.f);
+                window.setView(view);
+                actualizarSliders(event.size.width, event.size.height);
+            }
         }
 
         setVisibilidad(pantallaActual);
 
         window.setView(view);
-
         window.clear(sf::Color::White);
         tree.draw(window, font);
+
+        if (Deleter::animacionesCount > 0) {
+            EliminacionVisual& ev = Deleter::animacionesEliminacion[0];
+            ev.elapsedTime += animationClock.restart().asSeconds();
+            float offset = 100.f * ev.elapsedTime;
+
+            sf::CircleShape circle(20.f);
+            circle.setFillColor(sf::Color::Red);
+            circle.setPosition(ev.node->x - 20, ev.yOriginal + offset);
+            window.draw(circle);
+
+            if (offset > 200.f) {
+                for (int i = 1; i < Deleter::animacionesCount; ++i) {
+                    Deleter::animacionesEliminacion[i - 1] = Deleter::animacionesEliminacion[i];
+                }
+                Deleter::animacionesCount--;
+
+                if (Deleter::animacionesCount == 0) {
+                    Deleter::procesarEliminacionesPendientes();
+                    tree.updatePositions();
+                }
+            }
+}
 
         if (!Search::animationQueue.isEmpty()) {
             if (animationClock.getElapsedTime().asMilliseconds() >= 500) {

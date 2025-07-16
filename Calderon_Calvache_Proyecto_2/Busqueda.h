@@ -4,7 +4,6 @@
 #include "BinaryTree.h"
 #include <SFML/Graphics.hpp>
 #include <sstream>
-#include <queue>
 
 struct NodeQueuee {
     Node* steps[100];
@@ -56,13 +55,13 @@ public:
             return;
         }
 
-        std::queue<Node*> q;
-        q.push(root);
+        Node* queue[100];
+        int front = 0, rear = 0;
+        queue[rear++] = root;
         bool found = false;
 
-        while (!q.empty()) {
-            Node* current = q.front();
-            q.pop();
+        while (front != rear) {
+            Node* current = queue[front++];
 
             animationQueue.enqueue(current);
             result << current->value << ", ";
@@ -72,8 +71,8 @@ public:
                 break;
             }
 
-            if (current->left) q.push(current->left);
-            if (current->right) q.push(current->right);
+            if (current->left) queue[rear++] = current->left;
+            if (current->right) queue[rear++] = current->right;
         }
 
         if (found) {
@@ -128,7 +127,6 @@ private:
         return false;
     }
 };
-
 
 std::string Search::currentResult = "";
 NodeQueuee Search::animationQueue;
