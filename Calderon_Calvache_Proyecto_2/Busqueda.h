@@ -43,7 +43,7 @@ public:
         if (encontrar) {
             resultadoReal = "Busqueda en Profundidad: Encontrado " + std::to_string(target) + " -> Camino: " + resultado.str();
         } else {
-            resultadoReal = "!!!No se encontro el valor " + std::to_string(target);// + " -> Camino: " + resultado.str();
+            resultadoReal = "!!!No se encontro el valor " + std::to_string(target);
         }
     }
 
@@ -78,7 +78,7 @@ public:
         if (encontrar) {
             resultadoReal = "Busqueda en Anchura: Encontrado " + std::to_string(target) + " -> Camino: " + resultado.str();
         } else {
-            resultadoReal = "!!!No se encontro el valor " + std::to_string(target);// + " -> Camino: " + resultado.str();
+            resultadoReal = "!!!No se encontro el valor " + std::to_string(target);
         }
     }
 
