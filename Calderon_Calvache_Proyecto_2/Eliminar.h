@@ -1,7 +1,7 @@
 #ifndef ELIMINAR_H
 #define ELIMINAR_H
 
-#include "BinaryTree.h"
+#include "ArbolBinario.h"
 #include <string>
 
 struct EliminacionVisual {
@@ -10,74 +10,72 @@ struct EliminacionVisual {
     float elapsedTime;
 };
 
-class Deleter {
+class Eliminar {
 public:
     static std::string mensajes[10];
     static int mensajeCount;
     static EliminacionVisual animacionesEliminacion[10];
     static int animacionesCount;
 
-    static Node* nodosAEliminar[10];
+    static Node* nodosA[10];
     static int nodosPendientes;
 
-    static Node* remove(Node* root, int key, bool usarMayor, bool& eliminado) {
-        if (!root) return nullptr;
+    static Node* remove(Node* raiz, int key, bool usarMayor, bool& eliminado) {
+        if (!raiz) return nullptr;
 
-        if (key < root->value) {
-            root->left = remove(root->left, key, usarMayor, eliminado);
-        } else if (key > root->value) {
-            root->right = remove(root->right, key, usarMayor, eliminado);
+        if (key < raiz->valor) {
+            raiz->left = remove(raiz->left, key, usarMayor, eliminado);
+        } else if (key > raiz->valor) {
+            raiz->right = remove(raiz->right, key, usarMayor, eliminado);
         } else {
             if (animacionesCount < 10){
                 EliminacionVisual ev;
-                ev.node = root;
-                ev.yOriginal = root->y;
+                ev.node = raiz;
+                ev.yOriginal = raiz->y;
                 ev.elapsedTime = 0.f;
                 animacionesEliminacion[animacionesCount++] = ev;
             }
-            if (!root->left) {
-                Node* temp = root->right;
-               // delete root;
+            if (!raiz->left) {
+                Node* temp = raiz->right;
                if (nodosPendientes < 10) {
-                    nodosAEliminar[nodosPendientes++] = root;
+                    nodosA[nodosPendientes++] = raiz;
                 }
                 eliminado = true;
                 mensajes[mensajeCount++] = "Nodo eliminado.";
                 return temp;
-            } else if (!root->right) {
-                Node* temp = root->left;
+            } else if (!raiz->right) {
+                Node* temp = raiz->left;
                 if (nodosPendientes < 10) {
-                    nodosAEliminar[nodosPendientes++] = root;
+                    nodosA[nodosPendientes++] = raiz;
                 }
-                //delete root;
                 eliminado = true;
                 mensajes[mensajeCount++] = "Nodo eliminado.";
                 return temp;
             }
 
             if (usarMayor) {
-                Node* maxLeft = findMax(root->left);
-                root->value = maxLeft->value;
-                root->left = remove(root->left, maxLeft->value, usarMayor, eliminado);
+                Node* maxLeft = findMax(raiz->left);
+                raiz->valor = maxLeft->valor;
+                raiz->left = remove(raiz->left, maxLeft->valor, usarMayor, eliminado);
                 eliminado = true;
-                mensajes[mensajeCount++] = "Reemplazado por mayor del subarbol izquierdo.";
+                mensajes[mensajeCount++] = "Mayor del Menor";
             } else {
-                Node* minRight = findMin(root->right);
-                root->value = minRight->value;
-                root->right = remove(root->right, minRight->value, usarMayor, eliminado);
+                Node* minRight = findMin(raiz->right);
+                raiz->valor = minRight->valor;
+                raiz->right = remove(raiz->right, minRight->valor, usarMayor, eliminado);
                 eliminado = true;
-                mensajes[mensajeCount++] = "Reemplazado por menor del subarbol derecho.";
+                mensajes[mensajeCount++] = "Menor del Mayor";
             }
         }
-        return root;
+        return raiz;
     }
 
-    static void remove(BinaryTree& tree, int key, bool usarMayor, bool& eliminado) {
+    static void remove(ArbolBinario& arbol, int key, bool usarMayor, bool& eliminado) {
         mensajeCount = 0;
         eliminado = false;
         animacionesCount = 0;
         nodosPendientes = 0;
-        tree.setRoot(remove(tree.getRoot(), key, usarMayor, eliminado));
+        arbol.setRaiz(remove(arbol.obtenerRaiz(), key, usarMayor, eliminado));
         if (!eliminado) {
             mensajes[0] = "El numero no existe";
             mensajeCount = 1;
@@ -86,8 +84,8 @@ public:
 
     static void procesarEliminacionesPendientes() {
         for (int i = 0; i < nodosPendientes; ++i) {
-            delete nodosAEliminar[i];
-            nodosAEliminar[i] = nullptr;
+            delete nodosA[i];
+            nodosA[i] = nullptr;
         }
         nodosPendientes = 0;
     }
@@ -104,11 +102,11 @@ private:
     }
 };
 
-inline std::string Deleter::mensajes[10];
-inline int Deleter::mensajeCount = 0;
-inline EliminacionVisual Deleter::animacionesEliminacion[10];
-inline int Deleter::animacionesCount = 0;
-inline Node* Deleter::nodosAEliminar[10];
-inline int Deleter::nodosPendientes = 0;
+inline std::string Eliminar::mensajes[10];
+inline int Eliminar::mensajeCount = 0;
+inline EliminacionVisual Eliminar::animacionesEliminacion[10];
+inline int Eliminar::animacionesCount = 0;
+inline Node* Eliminar::nodosA[10];
+inline int Eliminar::nodosPendientes = 0;
 
-#endif // ELIMINAR_H_INCLUDED
+#endif // ELIMINAR_H_H_INCLUDED

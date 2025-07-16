@@ -52,11 +52,11 @@
 			<Add directory="D:/UNIVERSIDAD/6to Semestre(Tercero a medias)/Estructura de Datos/SFML2.5.1/SFML-2.5.1-windows-gcc-7.3.0-mingw-64-bit/SFML-2.5.1/lib" />
 			<Add directory="D:/UNIVERSIDAD/6to Semestre(Tercero a medias)/Estructura de Datos/TGUI 0.9.5/TGUI-0.9.5-mingw-7.3.0-64bit-for-SFML-2.5.1/TGUI-0.9/lib" />
 		</Linker>
+		<Unit filename="ArbolBinario.h" />
 		<Unit filename="Balanceo.h" />
-		<Unit filename="BinaryTree.h" />
 		<Unit filename="Busqueda.h" />
 		<Unit filename="Eliminar.h" />
-		<Unit filename="RecorridoIN.h" />
+		<Unit filename="Recorrido.h" />
 		<Unit filename="cb.bmp" />
 		<Unit filename="main.cpp" />
 		<Extensions>

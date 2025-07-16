@@ -1,44 +1,44 @@
 #ifndef BALANCEO_H_INCLUDED
 #define BALANCEO_H_INCLUDED
 
-#include "BinaryTree.h"
+#include "ArbolBinario.h"
 #include <string>
 #include <sstream>
 #include <SFML/Graphics.hpp>
 
 struct NodeQueueBal {
-    Node* steps[100];
+    Node* pasos[100];
     int front = 0;
-    int rear = 0;
+    int ultimo = 0;
 
     void enqueue(Node* n) {
-        steps[rear] = n;
-        rear = (rear + 1) % 100;
+        pasos[ultimo] = n;
+        ultimo = (ultimo + 1) % 100;
     }
 
     Node* dequeue() {
         if (isEmpty()) return nullptr;
-        Node* n = steps[front];
+        Node* n = pasos[front];
         front = (front + 1) % 100;
         return n;
     }
 
     bool isEmpty() {
-        return front == rear;
+        return front == ultimo;
     }
 
     void clear() {
-        front = rear = 0;
+        front = ultimo = 0;
     }
 };
 
-class Balancer {
+class Balancear {
 public:
     static std::string mensajes[10];
     static int rotacionIndex;
-    static NodeQueueBal animationQueue;
+    static NodeQueueBal animacionQueue;
 
-    static Node* rotateRight(Node* y) {
+    static Node* rotarRight(Node* y) {
         Node* x = y->left;
         Node* T2 = x->right;
         x->right = y;
@@ -46,7 +46,7 @@ public:
         return x;
     }
 
-    static Node* rotateLeft(Node* x) {
+    static Node* rotarLeft(Node* x) {
         Node* y = x->right;
         Node* T2 = y->left;
         y->left = x;
@@ -60,25 +60,25 @@ public:
         node->left = balance(node->left);
         node->right = balance(node->right);
 
-        int balanceFactor = getHeight(node->left) - getHeight(node->right);
+        int balanceFactor = obtenerAnchura(node->left) - obtenerAnchura(node->right);
 
         if (balanceFactor > 1) {
-            if (getHeight(node->left->left) >= getHeight(node->left->right)) {
-                record("II", node);
-                return rotateRight(node);
+            if (obtenerAnchura(node->left->left) >= obtenerAnchura(node->left->right)) {
+                grabar("II", node);
+                return rotarRight(node);
             } else {
-                record("ID", node);
-                node->left = rotateLeft(node->left);
-                return rotateRight(node);
+                grabar("ID", node);
+                node->left = rotarLeft(node->left);
+                return rotarRight(node);
             }
         } else if (balanceFactor < -1) {
-            if (getHeight(node->right->right) >= getHeight(node->right->left)) {
-                record("DD", node);
-                return rotateLeft(node);
+            if (obtenerAnchura(node->right->right) >= obtenerAnchura(node->right->left)) {
+                grabar("DD", node);
+                return rotarLeft(node);
             } else {
-                record("DI", node);
-                node->right = rotateRight(node->right);
-                return rotateLeft(node);
+                grabar("DI", node);
+                node->right = rotarRight(node->right);
+                return rotarLeft(node);
             }
         }
 
@@ -86,20 +86,20 @@ public:
     }
 
     static std::string wrapText(const std::string& texto, int anchoLinea) {
-        std::string result;
+        std::string resultado;
         int contador = 0;
         for (char c : texto) {
-            result += c;
+            resultado += c;
             contador++;
             if (contador >= anchoLinea && c == ' ') {
-                result += '\n';
+                resultado += '\n';
                 contador = 0;
             }
         }
-        return result;
+        return resultado;
     }
 
-    static void drawResult(sf::RenderWindow& window, sf::Font& font) {
+    static void mostrarResultado(sf::RenderWindow& window, sf::Font& font) {
         if (rotacionIndex == 0) return;
 
         std::ostringstream mensaje;
@@ -110,37 +110,37 @@ public:
         }
 
         std::string wrapped = wrapText(mensaje.str(), 60);
-        sf::Text resultText(wrapped, font, 18);
-        resultText.setFillColor(sf::Color::Green);
-        resultText.setPosition(20, 500);
+        sf::Text resultadoText(wrapped, font, 18);
+        resultadoText.setFillColor(sf::Color::Green);
+        resultadoText.setPosition(20, 500);
 
-        window.draw(resultText);
+        window.draw(resultadoText);
     }
 
     static void clear() {
         rotacionIndex = 0;
-        animationQueue.clear();
+        animacionQueue.clear();
     }
 
 private:
-    static void record(const char* msg, Node* n) {
+    static void grabar(const char* msg, Node* n) {
         if (rotacionIndex < 10) {
             mensajes[rotacionIndex] = msg;
             ++rotacionIndex;
-            if (n) animationQueue.enqueue(n);
+            if (n) animacionQueue.enqueue(n);
         }
     }
 
-    static int getHeight(Node* node) {
+    static int obtenerAnchura(Node* node) {
         if (!node) return 0;
-        int lh = getHeight(node->left);
-        int rh = getHeight(node->right);
+        int lh = obtenerAnchura(node->left);
+        int rh = obtenerAnchura(node->right);
         return 1 + (lh > rh ? lh : rh);
     }
 };
 
-inline std::string Balancer::mensajes[10];
-inline int Balancer::rotacionIndex = 0;
-inline NodeQueueBal Balancer::animationQueue;
+inline std::string Balancear::mensajes[10];
+inline int Balancear::rotacionIndex = 0;
+inline NodeQueueBal Balancear::animacionQueue;
 
 #endif // BALANCEO_H_INCLUDED

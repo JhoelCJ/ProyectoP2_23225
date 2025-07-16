@@ -2,9 +2,9 @@
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
-#include "BinaryTree.h"
+#include "ArbolBinario.h"
 #include "Balanceo.h"
-#include "RecorridoIN.h"
+#include "Recorrido.h"
 #include "Eliminar.h"
 #include "Busqueda.h"
 
@@ -25,7 +25,7 @@ int main() {
         return -1;
     }
 
-    BinaryTree tree;
+    ArbolBinario arbol;
     Pantalla pantallaActual = Pantalla::PRINCIPAL;
 
     bool textoVisible = false;
@@ -44,7 +44,7 @@ int main() {
     gui.add(statusLabel);
 
     sf::Clock statusClock;
-    bool statusVisible = false;
+    bool estaVisible = false;
 
     auto insertarBtn = tgui::Button::create("Insertar");
     insertarBtn->setPosition(130, 20);
@@ -57,24 +57,24 @@ int main() {
         if (!texto.empty()) {
             try {
                 int valor = std::stoi(texto);
-                bool inserted = tree.insert(valor);
+                bool inserted = arbol.insert(valor);
                 if (inserted) {
-                    tree.updatePositions();
-                    Traversal::animationQueue.clear();
-                    Search::animationQueue.clear();
-                    Traversal::currentResult.clear();
-                    Search::currentResult.clear();
+                    arbol.actualizarPosicion();
+                    Recorrido::animacionQueue.clear();
+                    Buscar::animacionQueue.clear();
+                    Recorrido::resultadoReal.clear();
+                    Buscar::resultadoReal.clear();
                     input->setText("");
                     statusLabel->setText("Numero insertado exitosamente");
                 } else {
                     statusLabel->setText("Numero repetido, intente nuevamente");
                 }
                 statusClock.restart();
-                statusVisible = true;
+                estaVisible = true;
             } catch (...) {
                 statusLabel->setText("Entrada invalida para insertar.");
                 statusClock.restart();
-                statusVisible = true;
+                estaVisible = true;
             }
         }
     });
@@ -87,9 +87,9 @@ int main() {
     gui.add(btnRecorrido);
     btnRecorrido->onPress([&]() {
         pantallaActual = Pantalla::RECORRIDO;
-        Traversal::currentResult.clear();
-        Search::currentResult.clear();
-        Balancer::clear();
+        Recorrido::resultadoReal.clear();
+        Buscar::resultadoReal.clear();
+        Balancear::clear();
         textoVisible = false;
     });
 
@@ -101,9 +101,9 @@ int main() {
     gui.add(btnBusqueda);
     btnBusqueda->onPress([&]() {
         pantallaActual = Pantalla::BUSQUEDA;
-        Traversal::currentResult.clear();
-        Search::currentResult.clear();
-        Balancer::clear();
+        Recorrido::resultadoReal.clear();
+        Buscar::resultadoReal.clear();
+        Balancear::clear();
         textoVisible = false;
     });
 
@@ -115,7 +115,7 @@ int main() {
     gui.add(btnEliminar);
     btnEliminar->onPress([&]() {
         pantallaActual = Pantalla::ELIMINAR;
-        Balancer::clear();
+        Balancear::clear();
         textoVisible = false;
     });
 
@@ -127,13 +127,13 @@ int main() {
     gui.add(btnBalancear);
     btnBalancear->onPress([&]() {
         pantallaActual = Pantalla::BALANCEO;
-        Traversal::animationQueue.clear();
-        Search::animationQueue.clear();
-        Balancer::animationQueue.clear();
-        Traversal::currentResult.clear();
-        Search::currentResult.clear();
-        Balancer::clear();
-        statusVisible = false;
+        Recorrido::animacionQueue.clear();
+        Buscar::animacionQueue.clear();
+        Balancear::animacionQueue.clear();
+        Recorrido::resultadoReal.clear();
+        Buscar::resultadoReal.clear();
+        Balancear::clear();
+        estaVisible = false;
         textoVisible = false;
     });
 
@@ -155,65 +155,65 @@ int main() {
     gui.add(recorridoBox);
     recorridoBox->onItemSelect([&]() {
         std::string selected = recorridoBox->getSelectedItem().toStdString();
-        Traversal::animationQueue.clear();
-        Traversal::currentResult.clear();
-        Search::animationQueue.clear();
-        Search::currentResult.clear();
+        Recorrido::animacionQueue.clear();
+        Recorrido::resultadoReal.clear();
+        Buscar::animacionQueue.clear();
+        Buscar::resultadoReal.clear();
 
         if (selected == "Inorden")
-            Traversal::inorder(tree.getRoot(), tree.getRoot(), window, font);
+            Recorrido::inOrden(arbol.obtenerRaiz(), arbol.obtenerRaiz(), window, font);
         else if (selected == "Preorden")
-            Traversal::preorder(tree.getRoot(), tree.getRoot(), window, font);
+            Recorrido::preOrdenRecursivo(arbol.obtenerRaiz(), arbol.obtenerRaiz(), window, font);
         else if (selected == "Postorden")
-            Traversal::postorder(tree.getRoot(), tree.getRoot(), window, font);
+            Recorrido::postOrden(arbol.obtenerRaiz(), arbol.obtenerRaiz(), window, font);
 
         textoVisible = true;//
     });
 
-    auto searchTypeBox = tgui::ComboBox::create();
-    searchTypeBox->setPosition(20, 60);
-    searchTypeBox->setSize(200, 30);
-    searchTypeBox->addItem("Busqueda en Profundidad");
-    searchTypeBox->addItem("Busqueda en Anchura");
-    searchTypeBox->setDefaultText("Tipo de Busqueda");
-    gui.add(searchTypeBox);
+    auto cajaBusqueda = tgui::ComboBox::create();
+    cajaBusqueda->setPosition(20, 60);
+    cajaBusqueda->setSize(200, 30);
+    cajaBusqueda->addItem("Busqueda en Profundidad");
+    cajaBusqueda->addItem("Busqueda en Anchura");
+    cajaBusqueda->setDefaultText("Tipo de Busqueda");
+    gui.add(cajaBusqueda);
 
-    auto searchBtn = tgui::Button::create("Buscar");
-    searchBtn->setPosition(230, 60);
-    searchBtn->setSize(80, 30);
-    gui.add(searchBtn);
-    searchBtn->onPress([&]() {
+    auto BuscarBtn = tgui::Button::create("Buscar");
+    BuscarBtn->setPosition(230, 60);
+    BuscarBtn->setSize(80, 30);
+    gui.add(BuscarBtn);
+    BuscarBtn->onPress([&]() {
         std::string texto = input->getText().toStdString();
-        std::string tipo = searchTypeBox->getSelectedItem().toStdString();
+        std::string tipo = cajaBusqueda->getSelectedItem().toStdString();
         if (texto.empty() || tipo.empty()) return;
         try {
             int valor = std::stoi(texto);
-            Traversal::animationQueue.clear();
-            Search::animationQueue.clear();
-            Traversal::currentResult.clear();
-            Search::currentResult.clear();
+            Recorrido::animacionQueue.clear();
+            Buscar::animacionQueue.clear();
+            Recorrido::resultadoReal.clear();
+            Buscar::resultadoReal.clear();
             if (tipo == "Busqueda en Profundidad")
-                Search::depthFirstSearch(tree.getRoot(), valor, window, font);
+                Buscar::depthFirstBuscar(arbol.obtenerRaiz(), valor, window, font);
             else
-                Search::breadthFirstSearch(tree.getRoot(), valor, window, font);
+                Buscar::breadthFirstBuscar(arbol.obtenerRaiz(), valor, window, font);
             input->setText("");
         } catch (...) {
             statusLabel->setText("Entrada invalida para busqueda.");
             statusClock.restart();
-            statusVisible = true;
+            estaVisible = true;
         }
     });
 
     auto metodoBox = tgui::ComboBox::create();
     metodoBox->setPosition(20, 60);
-    metodoBox->setSize(300, 30);
-    metodoBox->addItem("Reemplazar por el mayor del subarbol izquierdo");
-    metodoBox->addItem("Reemplazar por el menor del subarbol derecho");
+    metodoBox->setSize(175, 30);
+    metodoBox->addItem("Mayor del Menor");
+    metodoBox->addItem("Menor del Mayor");
     metodoBox->setSelectedItemByIndex(0);
     gui.add(metodoBox);
 
     auto eliminarRealBtn = tgui::Button::create("Eliminar Nodo");
-    eliminarRealBtn->setPosition(340, 60);
+    eliminarRealBtn->setPosition(200, 60);
     eliminarRealBtn->setSize(100, 30);
     gui.add(eliminarRealBtn);
     eliminarRealBtn->onPress([&]() {
@@ -223,23 +223,23 @@ int main() {
                 int valor = std::stoi(texto);
                 bool usarMayor = metodoBox->getSelectedItemIndex() == 0;
                 bool eliminado = false;
-                Deleter::remove(tree, valor, usarMayor, eliminado);
-                tree.updatePositions();
+                Eliminar::remove(arbol, valor, usarMayor, eliminado);
+                arbol.actualizarPosicion();
                 std::string mensaje;
-                for (int i = 0; i < Deleter::mensajeCount; ++i)
-                    mensaje += Deleter::mensajes[i] + " ";
+                for (int i = 0; i < Eliminar::mensajeCount; ++i)
+                    mensaje += Eliminar::mensajes[i] + " ";
                 statusLabel->setText(mensaje);
-                Traversal::animationQueue.clear();
-                Search::animationQueue.clear();
-                Traversal::currentResult.clear();
-                Search::currentResult.clear();
+                Recorrido::animacionQueue.clear();
+                Buscar::animacionQueue.clear();
+                Recorrido::resultadoReal.clear();
+                Buscar::resultadoReal.clear();
                 input->setText("");
                 statusClock.restart();
-                statusVisible = true;
+                estaVisible = true;
             } catch (...) {
                 statusLabel->setText("Error al eliminar nodo.");
                 statusClock.restart();
-                statusVisible = true;
+                estaVisible = true;
             }
         }
     });
@@ -249,24 +249,24 @@ int main() {
     avlBtn->setSize(120, 30);
     gui.add(avlBtn);
     avlBtn->onPress([&]() {
-        Balancer::animationQueue.clear();
-        Balancer::rotacionIndex = 0;
-        tree.setRoot(Balancer::balance(tree.getRoot()));
-        tree.updatePositions();
-        Traversal::animationQueue.clear();
-        Search::animationQueue.clear();
-        Traversal::currentResult.clear();
-        Search::currentResult.clear();
+        Balancear::animacionQueue.clear();
+        Balancear::rotacionIndex = 0;
+        arbol.setRaiz(Balancear::balance(arbol.obtenerRaiz()));
+        arbol.actualizarPosicion();
+        Recorrido::animacionQueue.clear();
+        Buscar::animacionQueue.clear();
+        Recorrido::resultadoReal.clear();
+        Buscar::resultadoReal.clear();
         statusLabel->setText("AVL aplicado.");
         statusClock.restart();
-        statusVisible = true;
+        estaVisible = true;
         textoVisible = true;
     });
 
     auto setVisibilidad = [&](Pantalla pantalla) {
         recorridoBox->setVisible(pantalla == Pantalla::RECORRIDO);
-        searchTypeBox->setVisible(pantalla == Pantalla::BUSQUEDA);
-        searchBtn->setVisible(pantalla == Pantalla::BUSQUEDA);
+        cajaBusqueda->setVisible(pantalla == Pantalla::BUSQUEDA);
+        BuscarBtn->setVisible(pantalla == Pantalla::BUSQUEDA);
         metodoBox->setVisible(pantalla == Pantalla::ELIMINAR);
         eliminarRealBtn->setVisible(pantalla == Pantalla::ELIMINAR);
         avlBtn->setVisible(pantalla == Pantalla::BALANCEO);
@@ -303,12 +303,12 @@ int main() {
 
     actualizarSliders(window.getSize().x, window.getSize().y);
 
-    sliderHorizontal->onValueChange([&](float value){
-            view.setCenter(value, view.getCenter().y);
+    sliderHorizontal->onValueChange([&](float valor){
+            view.setCenter(valor, view.getCenter().y);
     });
 
-    sliderVertical->onValueChange([&](float value){
-            view.setCenter(view.getCenter().x, value);
+    sliderVertical->onValueChange([&](float valor){
+            view.setCenter(view.getCenter().x, valor);
     });
 
     while (window.isOpen()) {
@@ -329,61 +329,61 @@ int main() {
 
         window.setView(view);
         window.clear(sf::Color::White);
-        tree.draw(window, font);
+        arbol.draw(window, font);
 
-        if (Deleter::animacionesCount > 0) {
-            EliminacionVisual& ev = Deleter::animacionesEliminacion[0];
+        if (Eliminar::animacionesCount > 0) {
+            EliminacionVisual& ev = Eliminar::animacionesEliminacion[0];
             ev.elapsedTime += animationClock.restart().asSeconds();
             float offset = 100.f * ev.elapsedTime;
 
-            sf::CircleShape circle(20.f);
-            circle.setFillColor(sf::Color::Red);
-            circle.setPosition(ev.node->x - 20, ev.yOriginal + offset);
-            window.draw(circle);
+            sf::CircleShape circulo(20.f);
+            circulo.setFillColor(sf::Color::Red);
+            circulo.setPosition(ev.node->x - 20, ev.yOriginal + offset);
+            window.draw(circulo);
 
             if (offset > 200.f) {
-                for (int i = 1; i < Deleter::animacionesCount; ++i) {
-                    Deleter::animacionesEliminacion[i - 1] = Deleter::animacionesEliminacion[i];
+                for (int i = 1; i < Eliminar::animacionesCount; ++i) {
+                    Eliminar::animacionesEliminacion[i - 1] = Eliminar::animacionesEliminacion[i];
                 }
-                Deleter::animacionesCount--;
+                Eliminar::animacionesCount--;
 
-                if (Deleter::animacionesCount == 0) {
-                    Deleter::procesarEliminacionesPendientes();
-                    tree.updatePositions();
+                if (Eliminar::animacionesCount == 0) {
+                    Eliminar::procesarEliminacionesPendientes();
+                    arbol.actualizarPosicion();
                 }
             }
 }
 
-        if (!Search::animationQueue.isEmpty()) {
+        if (!Buscar::animacionQueue.isEmpty()) {
             if (animationClock.getElapsedTime().asMilliseconds() >= 500) {
-                currentHighlight = Search::animationQueue.dequeue();
+                currentHighlight = Buscar::animacionQueue.dequeue();
                 animationClock.restart();
-                if (Search::animationQueue.isEmpty()) {
+                if (Buscar::animacionQueue.isEmpty()) {
                     animacionTerminada = true;
                     finalDelayClock.restart();
                 }
             }
-            Search::drawResult(window, font);
-        } else if (!Traversal::animationQueue.isEmpty()) {
+            Buscar::mostrarResultado(window, font);
+        } else if (!Recorrido::animacionQueue.isEmpty()) {
             if (animationClock.getElapsedTime().asMilliseconds() >= 500) {
-                currentHighlight = Traversal::animationQueue.dequeue();
+                currentHighlight = Recorrido::animacionQueue.dequeue();
                 animationClock.restart();
-                if (Traversal::animationQueue.isEmpty()) {
+                if (Recorrido::animacionQueue.isEmpty()) {
                     animacionTerminada = true;
                     finalDelayClock.restart();
                 }
             }
-            Traversal::drawResult(window, font);
-        } else if (!Balancer::animationQueue.isEmpty()) {
+            Recorrido::mostrarResultado(window, font);
+        } else if (!Balancear::animacionQueue.isEmpty()) {
             if (animationClock.getElapsedTime().asMilliseconds() >= 500) {
-                currentHighlight = Balancer::animationQueue.dequeue();
+                currentHighlight = Balancear::animacionQueue.dequeue();
                 animationClock.restart();
-                if (Balancer::animationQueue.isEmpty()) {
+                if (Balancear::animacionQueue.isEmpty()) {
                     animacionTerminada = true;
                     finalDelayClock.restart();
                 }
             }
-            Balancer::drawResult(window, font);
+            Balancear::mostrarResultado(window, font);
 
         } else if (animacionTerminada) {
             if (finalDelayClock.getElapsedTime().asMilliseconds() > 3000) {
@@ -395,14 +395,14 @@ int main() {
         }
 
         if (textoVisible) {
-            Traversal::drawResult(window, font);
-            Search::drawResult(window, font);
-            Balancer::drawResult(window, font);
+            Recorrido::mostrarResultado(window, font);
+            Buscar::mostrarResultado(window, font);
+            Balancear::mostrarResultado(window, font);
         }
 
-        if (statusVisible && statusClock.getElapsedTime().asSeconds() > 2.f) {
+        if (estaVisible && statusClock.getElapsedTime().asSeconds() > 2.f) {
             statusLabel->setText("");
-            statusVisible = false;
+            estaVisible = false;
         }
 
         if (currentHighlight) {

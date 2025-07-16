@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1752632535 source:d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\main.cpp
+1752644122 source:d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\main.cpp
 	<TGUI/TGUI.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
-	"BinaryTree.h"
+	"ArbolBinario.h"
 	"Balanceo.h"
-	"RecorridoIN.h"
+	"Recorrido.h"
 	"Eliminar.h"
 	"Busqueda.h"
 
@@ -1960,8 +1960,8 @@
 	<TGUI/GuiBase.hpp>
 	<SFML/Window/Event.hpp>
 
-1752616989 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\balanceo.h
-	"BinaryTree.h"
+1752644286 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\balanceo.h
+	"ArbolBinario.h"
 	<string>
 	<sstream>
 	<SFML/Graphics.hpp>
@@ -1971,12 +1971,21 @@
 	<SFML/Graphics.hpp>
 	<sstream>
 
-1752633484 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\eliminar.h
-	"BinaryTree.h"
+1752644234 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\eliminar.h
+	"ArbolBinario.h"
 	<string>
 
-1752630660 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\busqueda.h
-	"BinaryTree.h"
+1752644548 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\busqueda.h
+	"ArbolBinario.h"
+	<SFML/Graphics.hpp>
+	<sstream>
+
+1752643127 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\arbolbinario.h
+	<SFML/Graphics.hpp>
+	<cmath>
+
+1752644188 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\recorrido.h
+	"ArbolBinario.h"
 	<SFML/Graphics.hpp>
 	<sstream>
 

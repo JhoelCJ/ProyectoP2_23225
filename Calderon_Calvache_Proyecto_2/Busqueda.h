@@ -1,105 +1,105 @@
 #ifndef BUSQUEDA_H_INCLUDED
 #define BUSQUEDA_H_INCLUDED
 
-#include "BinaryTree.h"
+#include "ArbolBinario.h"
 #include <SFML/Graphics.hpp>
 #include <sstream>
 
 struct NodeQueuee {
-    Node* steps[100];
+    Node* pasos[100];
     int front = 0;
-    int rear = 0;
+    int ultimo = 0;
 
     void enqueue(Node* n) {
-        steps[rear] = n;
-        rear = (rear + 1) % 100;
+        pasos[ultimo] = n;
+        ultimo = (ultimo + 1) % 100;
     }
 
     Node* dequeue() {
         if (isEmpty()) return nullptr;
-        Node* n = steps[front];
+        Node* n = pasos[front];
         front = (front + 1) % 100;
         return n;
     }
 
     bool isEmpty() {
-        return front == rear;
+        return front == ultimo;
     }
 
     void clear() {
-        front = rear = 0;
+        front = ultimo = 0;
     }
 };
 
-class Search {
+class Buscar {
 public:
-    static std::string currentResult;
-    static NodeQueuee animationQueue;
+    static std::string resultadoReal;
+    static NodeQueuee animacionQueue;
 
-    static void depthFirstSearch(Node* node, int target, sf::RenderWindow& window, sf::Font& font) {
-        std::ostringstream result;
-        animationQueue.clear();
-        bool found = dfsRecursive(node, target, result);
-        if (found) {
-            currentResult = "Busqueda en Profundidad: Encontrado " + std::to_string(target) + " -> Camino: " + result.str();
+    static void depthFirstBuscar(Node* node, int target, sf::RenderWindow& window, sf::Font& font) {
+        std::ostringstream resultado;
+        animacionQueue.clear();
+        bool encontrar = dfsRecursive(node, target, resultado);
+        if (encontrar) {
+            resultadoReal = "Busqueda en Profundidad: Encontrado " + std::to_string(target) + " -> Camino: " + resultado.str();
         } else {
-            currentResult = "Busqueda en Profundidad: No se encontró " + std::to_string(target) + " -> Camino: " + result.str();
+            resultadoReal = "Busqueda en Profundidad: No se encontró " + std::to_string(target) + " -> Camino: " + resultado.str();
         }
     }
 
-    static void breadthFirstSearch(Node* root, int target, sf::RenderWindow& window, sf::Font& font) {
-        std::ostringstream result;
-        animationQueue.clear();
-        if (!root) {
-            currentResult = "Arbol vacio";
+    static void breadthFirstBuscar(Node* raiz, int target, sf::RenderWindow& window, sf::Font& font) {
+        std::ostringstream resultado;
+        animacionQueue.clear();
+        if (!raiz) {
+            resultadoReal = "Arbol vacio";
             return;
         }
 
         Node* queue[100];
-        int front = 0, rear = 0;
-        queue[rear++] = root;
-        bool found = false;
+        int front = 0, ultimo = 0;
+        queue[ultimo++] = raiz;
+        bool encontrar = false;
 
-        while (front != rear) {
-            Node* current = queue[front++];
+        while (front != ultimo) {
+            Node* actual = queue[front++];
 
-            animationQueue.enqueue(current);
-            result << current->value << ", ";
+            animacionQueue.enqueue(actual);
+            resultado << actual->valor << ", ";
 
-            if (current->value == target) {
-                found = true;
+            if (actual->valor == target) {
+                encontrar = true;
                 break;
             }
 
-            if (current->left) queue[rear++] = current->left;
-            if (current->right) queue[rear++] = current->right;
+            if (actual->left) queue[ultimo++] = actual->left;
+            if (actual->right) queue[ultimo++] = actual->right;
         }
 
-        if (found) {
-            currentResult = "Busqueda en Anchura: Encontrado " + std::to_string(target) + " -> Camino: " + result.str();
+        if (encontrar) {
+            resultadoReal = "Busqueda en Anchura: Encontrado " + std::to_string(target) + " -> Camino: " + resultado.str();
         } else {
-            currentResult = "Busqueda en Anchura: No se encontro " + std::to_string(target) + " -> Camino: " + result.str();
+            resultadoReal = "Busqueda en Anchura: No se encontro " + std::to_string(target) + " -> Camino: " + resultado.str();
         }
     }
 
     static std::string wrapText(const std::string& texto, int anchoLinea) {
-        std::string result;
+        std::string resultado;
         int contador = 0;
         for (char c : texto) {
-            result += c;
+            resultado += c;
             contador++;
             if (contador >= anchoLinea && c == ' ') {
-                result += '\n';
+                resultado += '\n';
                 contador = 0;
             }
         }
-        return result;
+        return resultado;
     }
 
-    static void drawResult(sf::RenderWindow& window, sf::Font& font) {
-        if (currentResult.empty()) return;
+    static void mostrarResultado(sf::RenderWindow& window, sf::Font& font) {
+        if (resultadoReal.empty()) return;
 
-        std::string wrapped = wrapText(currentResult, 60);
+        std::string wrapped = wrapText(resultadoReal, 60);
         sf::Text resultText(wrapped, font, 18);
         resultText.setFillColor(sf::Color::Blue);
         resultText.setPosition(20, 520);
@@ -113,22 +113,22 @@ public:
     }
 
 private:
-    static bool dfsRecursive(Node* node, int target, std::ostringstream& result) {
+    static bool dfsRecursive(Node* node, int target, std::ostringstream& resultado) {
         if (!node) return false;
 
-        animationQueue.enqueue(node);
-        result << node->value << ", ";
+        animacionQueue.enqueue(node);
+        resultado << node->valor << ", ";
 
-        if (node->value == target) return true;
+        if (node->valor == target) return true;
 
-        if (dfsRecursive(node->left, target, result)) return true;
-        if (dfsRecursive(node->right, target, result)) return true;
+        if (dfsRecursive(node->left, target, resultado)) return true;
+        if (dfsRecursive(node->right, target, resultado)) return true;
 
         return false;
     }
 };
 
-std::string Search::currentResult = "";
-NodeQueuee Search::animationQueue;
+std::string Buscar::resultadoReal = "";
+NodeQueuee Buscar::animacionQueue;
 
 #endif // BUSQUEDA_H_INCLUDED
