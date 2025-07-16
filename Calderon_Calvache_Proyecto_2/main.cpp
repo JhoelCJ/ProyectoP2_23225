@@ -15,7 +15,7 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "Arbol Binario Visual con TGUI");
     tgui::Gui gui(window);
-    //intento de que se pueda desplazar
+
     sf::View view = window.getDefaultView();
     float scrollSpeed = 30.f;
 
@@ -69,7 +69,7 @@ int main() {
                     input->setText("");
                     statusLabel->setText("Numero insertado exitosamente");
                 } else {
-                    statusLabel->setText("Número repetido, intente nuevamente");
+                    statusLabel->setText("Numero repetido, intente nuevamente");
                 }
                 statusClock.restart();
                 statusVisible = true;
@@ -93,6 +93,7 @@ int main() {
         pantallaActual = Pantalla::RECORRIDO;
         Traversal::currentResult.clear();
         Search::currentResult.clear();
+        Balancer::clear();
         textoVisible = false;
     });
 
@@ -108,6 +109,8 @@ int main() {
         pantallaActual = Pantalla::BUSQUEDA;
         Traversal::currentResult.clear();
         Search::currentResult.clear();
+        Balancer::clear();
+        textoVisible = false;
     });
 
     auto btnEliminar = tgui::Button::create("Eliminar");
@@ -118,7 +121,11 @@ int main() {
     btnEliminar->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
 
     gui.add(btnEliminar);
-    btnEliminar->onPress([&]() { pantallaActual = Pantalla::ELIMINAR; });
+    btnEliminar->onPress([&]() {
+        pantallaActual = Pantalla::ELIMINAR;
+        Balancer::clear();
+        textoVisible = false;
+    });
 
     auto btnBalancear = tgui::Button::create("Balancear");
     btnBalancear->setPosition(560, 20);
@@ -137,19 +144,19 @@ int main() {
         Traversal::currentResult.clear();
         Search::currentResult.clear();
         Balancer::clear();
-
+        statusVisible = false;
         textoVisible = false;
     });
 
-    auto btnVolver = tgui::Button::create("Volver");
-    btnVolver->setPosition(680, 20);
-    btnVolver->setSize(100, 30);
+    auto btnSalir = tgui::Button::create("Salir :(");
+    btnSalir->setPosition(680, 20);
+    btnSalir->setSize(100, 30);
 
-    btnVolver->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
-    btnVolver->getRenderer()->setBackgroundColorHover(tgui::Color::Yellow);
+    btnSalir->getRenderer()->setBackgroundColor(tgui::Color::Cyan);
+    btnSalir->getRenderer()->setBackgroundColorHover(tgui::Color::Red);
 
-    gui.add(btnVolver);
-    btnVolver->onPress([&]() { pantallaActual = Pantalla::PRINCIPAL; });
+    gui.add(btnSalir);
+    btnSalir->onPress([&]() { window.close(); });
 
     auto recorridoBox = tgui::ComboBox::create();
     recorridoBox->setPosition(20, 60);
@@ -228,7 +235,8 @@ int main() {
             try {
                 int valor = std::stoi(texto);
                 bool usarMayor = metodoBox->getSelectedItemIndex() == 0;
-                Deleter::remove(tree, valor, usarMayor);
+                bool eliminado = false;
+                Deleter::remove(tree, valor, usarMayor, eliminado);
                 tree.updatePositions();
                 std::string mensaje;
                 for (int i = 0; i < Deleter::mensajeCount; ++i)
@@ -281,45 +289,63 @@ int main() {
     Node* currentHighlight = nullptr;
     bool animacionTerminada = false;
     sf::Clock finalDelayClock;
-    //barrita
+
         auto sliderHorizontal = tgui::Slider::create();
-        sliderHorizontal->setPosition(0, 580);
-        sliderHorizontal->setSize(780, 20);
         sliderHorizontal->setMinimum(0);
         sliderHorizontal->setMaximum(1000);
-        sliderHorizontal->setValue(500);  // centro
+        sliderHorizontal->setValue(500);
         gui.add(sliderHorizontal);
 
         auto sliderVertical = tgui::Slider::create();
-        sliderVertical->setPosition(780, 0);
-        sliderVertical->setSize(20, 560);
+        sliderVertical->setVerticalScroll(true);
         sliderVertical->setMinimum(0);
         sliderVertical->setMaximum(1000);
-        sliderVertical->setValue(500); // centro
-        sliderVertical->setVerticalScroll(true);
+        sliderVertical->setValue(500);
         gui.add(sliderVertical);
 
-        // Vínculo con la vista
+        // Función para actualizar tamaño y posición de sliders
+        auto actualizarSliders = [&](unsigned int width, unsigned int height) {
+        sliderHorizontal->setSize(width - 10, 10); // horizontal delgada
+        sliderHorizontal->setPosition(0, height - 10);
+
+        sliderVertical->setSize(10, height - 10); // vertical delgada
+        sliderVertical->setPosition(width - 10, 0);
+
+        // Opcional: ajustar máximos en base al tamaño del view
+        sliderHorizontal->setMaximum(width * 2);
+        sliderVertical->setMaximum(height * 2);
+        };
+
+        // Llamada inicial
+        actualizarSliders(window.getSize().x, window.getSize().y);
+
+        // Reacciones a sliders
         sliderHorizontal->onValueChange([&](float value){
-            float centerX = value; // puedes ajustar con un factor si se mueve muy lento o muy rápido
-            view.setCenter(centerX, view.getCenter().y);
+            view.setCenter(value, view.getCenter().y);
         });
 
         sliderVertical->onValueChange([&](float value){
-            float centerY = value;
-            view.setCenter(view.getCenter().x, centerY);
+            view.setCenter(view.getCenter().x, value);
         });
 
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             gui.handleEvent(event);
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed){
                 window.close();
+        }else if (event.type == sf::Event::Resized) {
+    // Ajustar view y sliders cuando la ventana cambia de tamaño
+            view.setSize(event.size.width, event.size.height);
+            view.setCenter(event.size.width / 2.f, event.size.height / 2.f);
+            window.setView(view);
+
+            actualizarSliders(event.size.width, event.size.height);
+        }
         }
 
         setVisibilidad(pantallaActual);
-        //pa que todo se renderice bien
+
         window.setView(view);
 
         window.clear(sf::Color::White);
@@ -386,6 +412,5 @@ int main() {
         gui.draw();
         window.display();
     }
-
     return 0;
 }

@@ -18,6 +18,7 @@ private:
     Node* root;
     const float radius = 20.0f;
     const float verticalSpacing = 75.0f;
+
     int getDepth(Node* node) {
         if (node == nullptr) {
             return 0;
@@ -32,8 +33,6 @@ private:
             return 1 + profundidadDerecha;
         }
     }
-
-
 
 public:
 
@@ -50,9 +49,9 @@ public:
     }
 
     void draw(sf::RenderWindow& window, sf::Font& font) {
-        drawRecursive(window, font, root);
+        drawRecursive(window, font, root, true);
     }
-    // Estructura auxiliar para mantener el desplazamiento horizontal
+
     struct PositionTracker {
         int currentX = 0;
     };
@@ -65,18 +64,14 @@ public:
     void updatePositionsRecursive(Node* node, int depth, PositionTracker& tracker) {
         if (!node) return;
 
-        // Primero posicionamos el hijo izquierdo
         updatePositionsRecursive(node->left, depth + 1, tracker);
-
-        // Posicionamos el nodo actual en base al contador horizontal
-        node->x = 100 + tracker.currentX * 75;  // 100 = margen izquierdo, 75 = espacio horizontal
+        node->x = 100 + tracker.currentX * 75;
         node->y = 150 + depth * verticalSpacing;
+        tracker.currentX++;
 
-        tracker.currentX++;  // Avanzamos la "columna" horizontal
-
-        // Posicionamos el hijo derecho
         updatePositionsRecursive(node->right, depth + 1, tracker);
     }
+
 
 private:
     Node* insertRecursive(Node* node, int value, float x, float y, float offset, bool& inserted) {
@@ -125,7 +120,7 @@ private:
         window.draw(line, 2, sf::Lines);
     }
 
-    void drawRecursive(sf::RenderWindow& window, sf::Font& font, Node* node) {
+    void drawRecursive(sf::RenderWindow& window, sf::Font& font, Node* node, bool expandRadius = true) {
         if (!node) return;
 
         if (node->left)
@@ -134,20 +129,46 @@ private:
         if (node->right)
             drawLine(window, node->x, node->y, node->right->x, node->right->y, radius);
 
-        sf::CircleShape circle(radius);
+        int baseFontSize = 14;
+        sf::Text text(std::to_string(node->value), font, baseFontSize);
+        text.setFillColor(sf::Color::Black);
+
+        sf::FloatRect textBounds = text.getLocalBounds();
+        float textWidth = textBounds.width;
+
+        float adjustedRadius = radius;
+        int adjustedFontSize = baseFontSize;
+
+        if (expandRadius) {
+
+            if (textWidth > radius * 1.5f) {
+                adjustedRadius = textWidth * 0.6f;
+            }
+        } else {
+            while (textWidth > adjustedRadius * 1.5f && adjustedFontSize > 8) {
+                adjustedFontSize -= 1;
+                text.setCharacterSize(adjustedFontSize);
+                textBounds = text.getLocalBounds();
+                textWidth = textBounds.width;
+            }
+        }
+
+        sf::CircleShape circle(adjustedRadius);
         circle.setFillColor(sf::Color(200, 200, 255));
         circle.setOutlineColor(sf::Color::Black);
         circle.setOutlineThickness(2);
-        circle.setPosition(node->x - radius, node->y - radius);
+        circle.setPosition(node->x - adjustedRadius, node->y - adjustedRadius);
         window.draw(circle);
 
-        sf::Text text(std::to_string(node->value), font, 16);
-        text.setFillColor(sf::Color::Black);
-        text.setPosition(node->x - 10, node->y - 12);
+        textBounds = text.getLocalBounds();
+        text.setOrigin(textBounds.left + textBounds.width / 2.0f,
+                       textBounds.top + textBounds.height / 2.0f);
+        text.setPosition(node->x, node->y);
+
         window.draw(text);
 
-        drawRecursive(window, font, node->left);
-        drawRecursive(window, font, node->right);
+        drawRecursive(window, font, node->left, expandRadius);
+        drawRecursive(window, font, node->right, expandRadius);
     }
 };
 

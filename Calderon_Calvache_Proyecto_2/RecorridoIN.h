@@ -94,14 +94,14 @@ private:
         if (!node) return;
         inorderRecursive(node->left, result);
         animationQueue.enqueue(node);
-        result << node->value << " ";
+        result << node->value << ", ";
         inorderRecursive(node->right, result);
     }
 
     static void preorderRecursive(Node* node, std::ostringstream& result) {
         if (!node) return;
         animationQueue.enqueue(node);
-        result << node->value << " ";
+        result << node->value << ", ";
         preorderRecursive(node->left, result);
         preorderRecursive(node->right, result);
     }
@@ -111,7 +111,7 @@ private:
         postorderRecursive(node->left, result);
         postorderRecursive(node->right, result);
         animationQueue.enqueue(node);
-        result << node->value << " ";
+        result << node->value << ", ";
     }
 };
 

@@ -65,7 +65,7 @@ public:
             q.pop();
 
             animationQueue.enqueue(current);
-            result << current->value << " ";
+            result << current->value << ", ";
 
             if (current->value == target) {
                 found = true;
@@ -118,7 +118,7 @@ private:
         if (!node) return false;
 
         animationQueue.enqueue(node);
-        result << node->value << " ";
+        result << node->value << ", ";
 
         if (node->value == target) return true;
 
