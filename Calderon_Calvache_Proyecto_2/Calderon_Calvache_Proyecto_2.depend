@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1752644122 source:d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\main.cpp
+1752644578 source:d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\main.cpp
 	<TGUI/TGUI.hpp>
 	<SFML/Graphics.hpp>
 	<iostream>
@@ -1960,7 +1960,7 @@
 	<TGUI/GuiBase.hpp>
 	<SFML/Window/Event.hpp>
 
-1752644286 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\balanceo.h
+1752644643 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\balanceo.h
 	"ArbolBinario.h"
 	<string>
 	<sstream>
@@ -1975,7 +1975,7 @@
 	"ArbolBinario.h"
 	<string>
 
-1752644548 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\busqueda.h
+1752646321 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\busqueda.h
 	"ArbolBinario.h"
 	<SFML/Graphics.hpp>
 	<sstream>
@@ -1984,7 +1984,7 @@
 	<SFML/Graphics.hpp>
 	<cmath>
 
-1752644188 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\recorrido.h
+1752644604 d:\universidad\6to semestre(tercero a medias)\estructura de datos\p2\proyectop2\calderon_calvache_proyecto2\calderon_calvache_proyecto_2\recorrido.h
 	"ArbolBinario.h"
 	<SFML/Graphics.hpp>
 	<sstream>
