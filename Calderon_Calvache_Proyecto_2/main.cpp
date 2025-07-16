@@ -15,6 +15,9 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "Arbol Binario Visual con TGUI");
     tgui::Gui gui(window);
+    //intento de que se pueda desplazar
+    sf::View view = window.getDefaultView();
+    float scrollSpeed = 30.f;
 
     sf::Font font;
     if (!font.loadFromFile("fuente/MinecraftTen.ttf")) {
@@ -278,6 +281,34 @@ int main() {
     Node* currentHighlight = nullptr;
     bool animacionTerminada = false;
     sf::Clock finalDelayClock;
+    //barrita
+        auto sliderHorizontal = tgui::Slider::create();
+        sliderHorizontal->setPosition(0, 580);
+        sliderHorizontal->setSize(780, 20);
+        sliderHorizontal->setMinimum(0);
+        sliderHorizontal->setMaximum(1000);
+        sliderHorizontal->setValue(500);  // centro
+        gui.add(sliderHorizontal);
+
+        auto sliderVertical = tgui::Slider::create();
+        sliderVertical->setPosition(780, 0);
+        sliderVertical->setSize(20, 560);
+        sliderVertical->setMinimum(0);
+        sliderVertical->setMaximum(1000);
+        sliderVertical->setValue(500); // centro
+        sliderVertical->setVerticalScroll(true);
+        gui.add(sliderVertical);
+
+        // Vínculo con la vista
+        sliderHorizontal->onValueChange([&](float value){
+            float centerX = value; // puedes ajustar con un factor si se mueve muy lento o muy rápido
+            view.setCenter(centerX, view.getCenter().y);
+        });
+
+        sliderVertical->onValueChange([&](float value){
+            float centerY = value;
+            view.setCenter(view.getCenter().x, centerY);
+        });
 
     while (window.isOpen()) {
         sf::Event event;
@@ -288,6 +319,8 @@ int main() {
         }
 
         setVisibilidad(pantallaActual);
+        //pa que todo se renderice bien
+        window.setView(view);
 
         window.clear(sf::Color::White);
         tree.draw(window, font);

@@ -18,6 +18,22 @@ private:
     Node* root;
     const float radius = 20.0f;
     const float verticalSpacing = 75.0f;
+    int getDepth(Node* node) {
+        if (node == nullptr) {
+            return 0;
+        }
+
+        int profundidadIzquierda = getDepth(node->left);
+        int profundidadDerecha = getDepth(node->right);
+
+        if (profundidadIzquierda > profundidadDerecha) {
+            return 1 + profundidadIzquierda;
+        } else {
+            return 1 + profundidadDerecha;
+        }
+    }
+
+
 
 public:
 
@@ -36,9 +52,30 @@ public:
     void draw(sf::RenderWindow& window, sf::Font& font) {
         drawRecursive(window, font, root);
     }
+    // Estructura auxiliar para mantener el desplazamiento horizontal
+    struct PositionTracker {
+        int currentX = 0;
+    };
 
     void updatePositions() {
-        updatePositionsRecursive(root, 400, 125, 200);
+        PositionTracker tracker;
+        updatePositionsRecursive(root, 0, tracker);
+    }
+
+    void updatePositionsRecursive(Node* node, int depth, PositionTracker& tracker) {
+        if (!node) return;
+
+        // Primero posicionamos el hijo izquierdo
+        updatePositionsRecursive(node->left, depth + 1, tracker);
+
+        // Posicionamos el nodo actual en base al contador horizontal
+        node->x = 100 + tracker.currentX * 75;  // 100 = margen izquierdo, 75 = espacio horizontal
+        node->y = 150 + depth * verticalSpacing;
+
+        tracker.currentX++;  // Avanzamos la "columna" horizontal
+
+        // Posicionamos el hijo derecho
+        updatePositionsRecursive(node->right, depth + 1, tracker);
     }
 
 private:
